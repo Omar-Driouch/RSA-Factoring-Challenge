@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+
+# Function to check factors
+check_factors() {
+    if [ $# -ne 3 ]; then
+        arguments=("$@")
+        count=0
+        factor2=1
+        for arg in "${arguments[@]}"; do
+            if [ $count -gt 1 ]; then
+                factor2=$(echo "$arg * $factor2" | bc)
+            fi
+            count=$((count + 1))
+        done
+    else
+        factor2=$3
+    fi
+
+    factor1=$2
+    expression=$(echo "$1" | tr ':' '=')
+
+    result=$(echo "if($factor2 > $factor1) 1 else 0" | bc)
+    if ((result == 1)); then
+        temp=$factor1
+        factor1=$factor2
+        factor2=$temp
+    fi
+
+    echo "$expression$factor1 * $factor2"
+}
+
+if [ $# -ne 1 ]; then
+    echo 'Usage: rsa <file>'
+    exit 1
+else
+    while read line; do
+        factor_result=$(factor "$line")
+        check_factors $factor_result
+    done < "$1"
+fi
