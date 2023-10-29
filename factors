@@ -1,0 +1,35 @@
+#!/bin/bash
+
+# Check if the file exists
+if [ ! -f test.txt ]; then
+    echo "File test.txt not found."
+    exit 1
+fi
+
+# Function to find the exact two prime factors
+find_exact_two_prime_factors() {
+    num=$1
+
+    for ((i = 2; i <= num / 2; i++)); do
+        if ((num % i == 0)); then
+            factor1=$i
+            factor2=$((num / i))
+
+            # Check if factor1 and factor2 are prime numbers
+            is_prime_factor1=$(factor $factor1 | grep -c $factor1)
+            is_prime_factor2=$(factor $factor2 | grep -c $factor2)
+
+            if ((is_prime_factor1 == 1 && is_prime_factor2 == 1)); then
+                echo "$1 = $factor2 * $factor1"
+                return
+            fi
+        fi
+    done
+
+    echo "No exact two prime factors found for $1"
+}
+
+# Reading numbers from the file
+while read -r number; do
+    find_exact_two_prime_factors $number
+done < test.txt
