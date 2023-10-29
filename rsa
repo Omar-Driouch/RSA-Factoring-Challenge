@@ -1,40 +1,48 @@
 #!/usr/bin/env bash
+#is a challenge
+check_factor()
+{
+	if [ $# -ne 3 ];
+        then
+                args=("$@")
+                count=0
+                num2=1
+                for a in ${args[*]};
+                do
+                        if [ $count -gt 1 ];
+                        then
+                                num2=$(echo $a*$num2 | bc)
+                        fi
+                        count=$((count + 1))
+                done
+        else
+                num2=$3
+        fi
 
-# Function to check factors
-check_factors() {
-    if [ $# -ne 3 ]; then
-        arguments=("$@")
-        count=0
-        factor2=1
-        for arg in "${arguments[@]}"; do
-            if [ $count -gt 1 ]; then
-                factor2=$(echo "$arg * $factor2" | bc)
-            fi
-            count=$((count + 1))
-        done
-    else
-        factor2=$3
-    fi
+        num1=$2
+        num=$(echo "$1" | tr ':' '=')
 
-    factor1=$2
-    expression=$(echo "$1" | tr ':' '=')
+        result=$(echo "if($num2 > $num1) 1 else 0" | bc)
+	        if ((result == 1)); then
+		        numcp=$num1
+		        num1=$num2
+		        num2=$numcp
+                fi
 
-    result=$(echo "if($factor2 > $factor1) 1 else 0" | bc)
-    if ((result == 1)); then
-        temp=$factor1
-        factor1=$factor2
-        factor2=$temp
-    fi
-
-    echo "$expression$factor1 * $factor2"
+        echo "$num$num1*$num2"
 }
 
-if [ $# -ne 1 ]; then
-    echo 'Usage: rsa <file>'
-    exit 1
+if [ $# -ne 1 ]
+then
+        echo 'Usage: rsa <file>'
+        exit 1
 else
-    while read line; do
-        factor_result=$(factor "$line")
-        check_factors $factor_result
-    done < "$1"
+
+        while read i
+        do
+
+                result=$(factor "$i")
+                check_factor $result
+
+        done < "$1"
 fi
