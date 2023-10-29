@@ -1,48 +1,48 @@
-#!/bin/bash
-
-# Check if a file is provided as an argument
-if [ $# -ne 1 ]; then
-    echo "Usage: $0 <file_with_numbers>"
-    exit 1
-fi
-
-file=$1
-
-# Check if the file exists
-if [ ! -f "$file" ]; then
-    echo "File not found!"
-    exit 1
-fi
-
-# Function to factorize a number
-factorize() {
-    num=$1
-    factors=""
-    divisor=2
-    firstFactor=1 # Check if the first factor has been added
-
-    while [ $num -gt 1 ]; do
-        if [ $((num % divisor)) -eq 0 ]; then
-            if [ $firstFactor -eq 1 ]; then
-                factors+="$divisor"
-                firstFactor=0
-            else
-                factors+=" * $divisor"
-            fi
-            num=$((num / divisor))
+#!/usr/bin/env bash
+#is a challenge
+check_factor()
+{
+	if [ $# -ne 3 ];
+        then
+                args=("$@")
+                count=0
+                num2=1
+                for a in ${args[*]};
+                do
+                        if [ $count -gt 1 ];
+                        then
+                                num2=$(echo $a*$num2 | bc)
+                        fi
+                        count=$((count + 1))
+                done
         else
-            divisor=$((divisor + 1))
+                num2=$3
         fi
-    done
 
-    if [ "$factors" == "" ]; then
-        factors="$1"
-    fi
+        num1=$2
+        num=$(echo "$1" | tr ':' '=')
 
-    echo "$1 = $factors"
+        result=$(echo "if($num2 > $num1) 1 else 0" | bc)
+	        if ((result == 1)); then
+		        numcp=$num1
+		        num1=$num2
+		        num2=$numcp
+                fi
+
+        echo "$num$num1*$num2"
 }
 
-# Read each number from the file and factorize
-while IFS= read -r number; do
-    factorize "$number"
-done < "$file"
+if [ $# -ne 1 ]
+then
+        echo 'Usage: rsa <file>'
+        exit 1
+else
+
+        while read i
+        do
+
+                result=$(factor "$i")
+                check_factor $result
+
+        done < "$1"
+fi
