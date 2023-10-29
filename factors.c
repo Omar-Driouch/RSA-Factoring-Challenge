@@ -26,9 +26,9 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    signal(SIGALRM, SIG_IGN); // Ignore alarm in case the file processing exceeds 5 seconds
+    signal(SIGALRM, SIG_IGN); 
 
-    alarm(5); // Set an alarm for 5 seconds
+    alarm(5); 
 
     int num;
     while (fscanf(file, "%d", &num) == 1) {
