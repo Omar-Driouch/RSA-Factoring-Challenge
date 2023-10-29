@@ -1,35 +1,41 @@
-#!/bin/bash
+#!/usr/bin/env bash
+# Script for the factors challenge
 
-# Check if the file exists
-if [ ! -f test.txt ]; then
-    echo "File test.txt not found."
-    exit 1
-fi
+calculate_factors() {
+    if [ $# -ne 3 ]; then
+        input_args=("$@")
+        position_count=0
+        factor_product=1
 
-# Function to find the exact two prime factors
-find_exact_two_prime_factors() {
-    num=$1
-
-    for ((i = 2; i <= num / 2; i++)); do
-        if ((num % i == 0)); then
-            factor1=$i
-            factor2=$((num / i))
-
-            # Check if factor1 and factor2 are prime numbers
-            is_prime_factor1=$(factor $factor1 | grep -c $factor1)
-            is_prime_factor2=$(factor $factor2 | grep -c $factor2)
-
-            if ((is_prime_factor1 == 1 && is_prime_factor2 == 1)); then
-                echo "$1 = $factor2 * $factor1"
-                return
+        for arg in ${input_args[*]}; do
+            if [ $position_count -gt 1 ]; then
+                factor_product=$(echo $arg*$factor_product | bc)
             fi
-        fi
-    done
+            position_count=$((position_count + 1))
+        done
+    else
+        factor_product=$3
+    fi
 
-    echo "No exact two prime factors found for $1"
+    first_number=$2
+    converted_num=$(echo "$1" | tr ':' '=')
+
+    comparison_result=$(echo "if($factor_product > $first_number) 1 else 0" | bc)
+    if ((comparison_result == 1)); then
+        temp_number=$first_number
+        first_number=$factor_product
+        factor_product=$temp_number
+    fi
+
+    echo "$converted_num$first_number*$factor_product"
 }
 
-# Reading numbers from the file
-while read -r number; do
-    find_exact_two_prime_factors $number
-done < test.txt
+if [ $# -ne 1 ]; then
+    echo 'Usage: factors <file>'
+    exit 1
+else
+    while read line; do
+        factor_result=$(factor "$line")
+        calculate_factors $factor_result
+    done < "$1"
+fi
